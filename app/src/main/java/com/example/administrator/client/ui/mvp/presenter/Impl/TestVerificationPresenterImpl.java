@@ -5,7 +5,6 @@ import com.example.administrator.client.ui.mvp.model.Impl.TestVerificationModelI
 import com.example.administrator.client.ui.mvp.model.TestVerificationModel;
 import com.example.administrator.client.ui.mvp.presenter.TestVerificationPresenter;
 import com.example.administrator.client.ui.mvp.view.TestVerificationView;
-import com.squareup.okhttp.Response;
 
 /**
  * Created by Administrator on 2016/11/18.
@@ -25,12 +24,12 @@ public class TestVerificationPresenterImpl implements TestVerificationPresenter 
         testVerificationModel.loadDatas(phone, verification, new TestVerificationModel.Callback() {
             @Override
             public void loadSuccess(ResponseClient client) {
-                testVerificationView.testSuccess(client);
+                testVerificationView.testVerificationSuccess(client);
             }
 
             @Override
             public void loadFailed() {
-                testVerificationView.testFailed();
+                testVerificationView.testVerificationFailed();
             }
         });
     }

@@ -7,6 +7,6 @@ import com.example.administrator.client.entity.ResponseClient;
  */
 
 public interface TestPhoneView {
-    void Success(ResponseClient responseClient);
-    void Failed();
+    void TestPhoneSuccess(ResponseClient responseClient);
+    void TestPhoneFailed();
 }

@@ -130,18 +130,25 @@ public class MainActivity extends BaseActivity implements ClientView {
     @Override
     public void showSuccess(ResponseClient responseClient) {
         handler.sendMessage(handler.obtainMessage(1, responseClient));
+        isClick = false;
     }
 
     @Override
     public void showFailed() {
-        Toast.makeText(this, "登录失败", Toast.LENGTH_LONG);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, "登录失败", Toast.LENGTH_LONG);
+            }
+        });
+
     }
 
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             ResponseClient responseClient = (ResponseClient) msg.obj;
-            Toast.makeText(MainActivity.this, responseClient.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, responseClient.getMessage(), Toast.LENGTH_SHORT).show();
         }
     };
 }

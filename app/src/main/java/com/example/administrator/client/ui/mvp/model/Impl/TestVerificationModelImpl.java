@@ -23,11 +23,11 @@ public class TestVerificationModelImpl implements TestVerificationModel {
     public void loadDatas(String phone, String verification, final Callback callback) {
         //type：verify mobile：手机号码 verify_code：验证码
         HashMap<String,String> map = new HashMap<>();
-        map.put("type","verify");
+        map.put("type","signup");
         map.put("mobile",phone);
         map.put("verify_code",verification);
         RequestBody body = new FormEncodingBuilder()
-                .add("type","verify")
+                .add("type","signup")
                 .add("mobile",phone)
                 .add("verify_code",verification)
                 .build();

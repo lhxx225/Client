@@ -8,7 +8,6 @@ import android.os.Message;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,7 +32,7 @@ import butterknife.ButterKnife;
  * Created by Administrator on 2016/11/17.
  */
 
-public class ReceiveVerificationActivity extends BaseActivity implements ReceiveVerificationView, TestPhoneView ,TestVerificationView{
+public class ReceiveVerificationActivity extends BaseActivity implements ReceiveVerificationView, TestPhoneView, TestVerificationView {
     @BindView(R.id.editText_user)
     EditText editTextUser;
     @BindView(R.id.editText_verification)
@@ -45,8 +44,30 @@ public class ReceiveVerificationActivity extends BaseActivity implements Receive
     private TestPhonePresenter testPhonePresenter;
     private ReceiveVerificationPresenter receiveVerificationPresenter;
     private TestVerificationPresenter testVerificationPresenter;
-    private String verificationCode;
     private int i = 60;
+
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+                    String str = (String) msg.obj;
+                    Toast.makeText(ReceiveVerificationActivity.this, str, Toast.LENGTH_SHORT).show();
+                    break;
+                case 2:
+                    i--;
+                    if (i == 0) {
+                        i = 60;
+                        textViewReceiveVerification.setText("获取验证码");
+                        textViewReceiveVerification.setEnabled(true);
+                        return;
+                    }
+                    textViewReceiveVerification.setText(i + "s后重新获取");
+                    sendEmptyMessageDelayed(2, 1000);
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,12 +106,11 @@ public class ReceiveVerificationActivity extends BaseActivity implements Receive
             @Override
             public void onClick(View v) {
                 if (TextUtils.isEmpty(editTextUser.getText().toString())) {
-                    Toast.makeText(ReceiveVerificationActivity.this, "请输入手机号", Toast.LENGTH_LONG);
+                    Toast.makeText(ReceiveVerificationActivity.this, "请输入手机号", Toast.LENGTH_SHORT);
                 } else if (editTextUser.getText().toString().length() < 11) {
-                    Toast.makeText(ReceiveVerificationActivity.this, "手机号码不正确", Toast.LENGTH_LONG);
+                    Toast.makeText(ReceiveVerificationActivity.this, "手机号码不正确", Toast.LENGTH_SHORT);
                 } else {
-//                    receiveVerificationPresenter.loadDatas(editTextUser.getText().toString());
-                    Toast.makeText(ReceiveVerificationActivity.this, "验证码发送成功", Toast.LENGTH_LONG).show();
+                    receiveVerificationPresenter.loadDatas(editTextUser.getText().toString());
                     textViewReceiveVerification.setEnabled(false);
                     handler.sendEmptyMessage(2);
                 }
@@ -104,8 +124,8 @@ public class ReceiveVerificationActivity extends BaseActivity implements Receive
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(start == 5){
-                    testVerificationPresenter.loadDatas(editTextUser.getText().toString(),editTextVerification.getText().toString());
+                if (start == 5) {
+                    testVerificationPresenter.loadDatas(editTextUser.getText().toString(), editTextVerification.getText().toString());
                 }
             }
 
@@ -117,9 +137,9 @@ public class ReceiveVerificationActivity extends BaseActivity implements Receive
         textViewNextStpe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ReceiveVerificationActivity.this,RegisterActivity.class);
-                intent.putExtra("phone",editTextUser.getText().toString());
-                intent.putExtra("verification",editTextVerification.getText().toString());
+                Intent intent = new Intent(ReceiveVerificationActivity.this, RegisterActivity.class);
+                intent.putExtra("phone", editTextUser.getText().toString());
+                intent.putExtra("verification", editTextVerification.getText().toString());
                 startActivity(intent);
             }
         });
@@ -141,70 +161,68 @@ public class ReceiveVerificationActivity extends BaseActivity implements Receive
     }
 
     @Override
-    public void showSuccess(ResponseClient responseClient) {
-        if("验证码不正确".equals(responseClient.getMessage())){
-            Toast.makeText(this, "验证码不正确,请重新输入", Toast.LENGTH_SHORT).show();
-            editTextVerification.getText().clear();
-        }else {
-            textViewNextStpe.setEnabled(true);
-            textViewNextStpe.setTextColor(Color.argb(0xff,0xff,0xff,0xff));
-        }
-    }
-
-    @Override
-    public void showFailed() {
-
-    }
-
-    @Override
-    public void Success(ResponseClient responseClient) {
-        if("手机号未填写或格式不正确".equals(responseClient.getMessage())){
-            handler.sendMessage(handler.obtainMessage(3, "手机号码不正确"));
-        }else if ("手机号不存在".equals(responseClient.getMessage())) {
-            handler.sendMessage(handler.obtainMessage(1, responseClient));
-        }
-
-    }
-
-    @Override
-    public void Failed() {
-
-    }
-    @Override
-    public void testSuccess(ResponseClient client) {
-        Log.d("aa", client.getMessage());
-    }
-
-    @Override
-    public void testFailed() {
-
-    }
-
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-                    ResponseClient responseClient = (ResponseClient) msg.obj;
-                    Toast.makeText(ReceiveVerificationActivity.this, "可以注册", Toast.LENGTH_LONG).show();
-                    break;
-                case 2:
-                    i--;
-                    if(i == 0){
-                        i = 60;
-                        textViewReceiveVerification.setText("获取验证码");
-                        textViewReceiveVerification.setEnabled(true);
-                        return;
-                    }
-                    textViewReceiveVerification.setText(i+"s后重新获取");
-                    sendEmptyMessageDelayed(2,1000);
-                    break;
-                case 3:
-                    String str = (String) msg.obj;
-                    Toast.makeText(ReceiveVerificationActivity.this,str, Toast.LENGTH_LONG).show();
+    public void ReceiveVerificationSuccess(ResponseClient responseClient) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(ReceiveVerificationActivity.this, "验证码发送成功", Toast.LENGTH_SHORT).show();
             }
+        });
+    }
+
+    @Override
+    public void ReceiveVerificationFailed() {
+
+    }
+
+    @Override
+    public void TestPhoneSuccess(ResponseClient responseClient) {
+        if ("手机号未填写或格式不正确".equals(responseClient.getMessage())) {
+            handler.sendMessage(handler.obtainMessage(1, "手机号码不正确"));
+        } else if ("手机号不存在".equals(responseClient.getMessage())) {
+            handler.sendMessage(handler.obtainMessage(1,"可以注册"));
+        }else {
+            handler.sendMessage(handler.obtainMessage(1,responseClient.getMessage()));
         }
-    };
+    }
 
+    @Override
+    public void TestPhoneFailed() {
 
+    }
+
+    @Override
+    public void testVerificationSuccess(final ResponseClient client) {
+        if ("验证码不正确".equals(client.getMessage())) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(ReceiveVerificationActivity.this, "验证码不正确,请重新输入", Toast.LENGTH_SHORT).show();
+                    editTextVerification.getText().clear();
+
+                }
+            });
+        }else if("手机号未填写或格式不正确".equals(client.getMessage())){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(ReceiveVerificationActivity.this, "手机号未填写或格式不正确", Toast.LENGTH_SHORT).show();
+                    editTextVerification.getText().clear();
+                }
+            });
+        }else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    textViewNextStpe.setEnabled(true);
+                    textViewNextStpe.setTextColor(Color.argb(0xff, 0xff, 0xff, 0xff));
+                }
+            });
+        }
+    }
+
+    @Override
+    public void testVerificationFailed() {
+
+    }
 }

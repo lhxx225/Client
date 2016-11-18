@@ -24,12 +24,12 @@ public class ReceiveVerificationPresenterImpl implements ReceiveVerificationPres
         receiveVerificationModel.loadDatas(phone, new ReceiveVerificationModel.Callback() {
             @Override
             public void loadSuccess(ResponseClient responseClient) {
-                receiveVerificationView.showSuccess(responseClient);
+                receiveVerificationView.ReceiveVerificationSuccess(responseClient);
             }
 
             @Override
             public void loadFailed() {
-                receiveVerificationView.showFailed();
+                receiveVerificationView.ReceiveVerificationFailed();
             }
         });
     }

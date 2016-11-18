@@ -7,6 +7,6 @@ import com.example.administrator.client.entity.ResponseClient;
  */
 
 public interface ReceiveVerificationView {
-    void showSuccess(ResponseClient responseClient);
-    void showFailed();
+    void ReceiveVerificationSuccess(ResponseClient responseClient);
+    void ReceiveVerificationFailed();
 }

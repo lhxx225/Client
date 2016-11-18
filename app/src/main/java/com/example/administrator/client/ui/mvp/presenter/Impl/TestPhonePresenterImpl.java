@@ -24,12 +24,12 @@ public class TestPhonePresenterImpl implements TestPhonePresenter {
         testPhoneModel.loadDatas(phone, new TestPhoneModel.Callback() {
             @Override
             public void loadSuccess(ResponseClient responseClient) {
-                testPhoneView.Success(responseClient);
+                testPhoneView.TestPhoneSuccess(responseClient);
             }
 
             @Override
             public void loadFailed() {
-
+                testPhoneView.TestPhoneFailed();
             }
         });
     }
